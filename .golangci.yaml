@@ -1,0 +1,30 @@
+linters-settings:
+    gocritic:
+        enabled-tags:
+            - performance
+
+linters:
+    enable:
+        - govet
+        - errcheck
+        - staticcheck
+        - unused
+        - gosimple
+        - structcheck
+        - varcheck
+        - ineffassign
+        - deadcode
+        - typecheck
+        - golint
+        - gocritic
+
+run:
+    timeout: 20m
+    skip-dirs:
+        - "pkg/.*/mock_.*"
+        - "pkg/api/handler" # TODO: エラーハンドリング時に消去する
+        - "pkg/api/middleware"
+        - "mysql"
+
+issues:
+    exclude-rules:

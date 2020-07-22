@@ -1,0 +1,22 @@
+syntax = "proto3";
+package proto_user;
+
+option go_package = "pb";
+
+service UserService {
+  // 新規ユーザ作成
+  rpc CreateUser (CreateUserRequest) returns (UserInfo) {
+  };
+}
+
+// 新規ユーザ作成リクエスト
+message CreateUserRequest {
+  string name = 1; // ユーザ名
+  string thumbnail = 2; // アイコンのURL
+}
+
+// ユーザ情報
+message UserInfo {
+  string name = 1; // ユーザ名
+  string thumbnail = 2; // アイコンのURL
+}

@@ -1,0 +1,2 @@
+# DataFlow-backendService
+gRPCを使ってlocalのラズパイにNode-REDフローデータを送信するサービス
