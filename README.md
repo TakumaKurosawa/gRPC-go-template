@@ -1,2 +1,2 @@
-# DataFlow-backendService
-gRPCを使ってlocalのラズパイにNode-REDフローデータを送信するサービス
+# gRPC-go-template
+gRPCをGoで書きたい時のテンプレート with Firebase authentication
