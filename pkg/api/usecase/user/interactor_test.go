@@ -1,12 +1,12 @@
 package user
 
 import (
-	"testing"
+	"context"
 	"dataflow/pkg/domain/entity"
 	"dataflow/pkg/domain/repository"
 	"dataflow/pkg/domain/service/user/mock_user"
+	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +19,7 @@ const (
 )
 
 func TestIntereractor_CreateNewUser(t *testing.T) {
-	ctx := &gin.Context{}
+	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -27,16 +27,21 @@ func TestIntereractor_CreateNewUser(t *testing.T) {
 	masterTxManager := repository.NewMockMasterTxManager(masterTx)
 
 	userService := mock_user.NewMockService(ctrl)
-	userService.EXPECT().CreateNewUser(ctx, masterTx, uid, name, thumbnail).Return(nil).Times(1)
+	userService.EXPECT().CreateNewUser(ctx, masterTx, uid, name, thumbnail).Return(&entity.User{
+		ID:        userID,
+		Name:      name,
+		Thumbnail: thumbnail,
+	}, nil).Times(1)
 
 	interactor := New(masterTxManager, userService)
-	err := interactor.CreateNewUser(ctx, uid, name, thumbnail)
+	insertedUser, err := interactor.CreateNewUser(ctx, uid, name, thumbnail)
 
 	assert.NoError(t, err)
+	assert.NotNil(t, insertedUser)
 }
 
 func TestIntereractor_GetUserProfile(t *testing.T) {
-	ctx := &gin.Context{}
+	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -60,7 +65,7 @@ func TestIntereractor_GetUserProfile(t *testing.T) {
 }
 
 func TestIntereractor_GetAll(t *testing.T) {
-	ctx := &gin.Context{}
+	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 

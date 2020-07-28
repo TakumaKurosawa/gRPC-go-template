@@ -5,10 +5,10 @@
 package mock_user
 
 import (
-	"context"
-	reflect "reflect"
+	context "context"
 	entity "dataflow/pkg/domain/entity"
 	repository "dataflow/pkg/domain/repository"
+	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -37,11 +37,12 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 }
 
 // InsertUser mocks base method
-func (m *MockRepository) InsertUser(ctx context.Context, masterTx repository.MasterTx, uid, name, thumbnail string) error {
+func (m *MockRepository) InsertUser(ctx context.Context, masterTx repository.MasterTx, uid, name, thumbnail string) (*entity.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertUser", ctx, masterTx, uid, name, thumbnail)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // InsertUser indicates an expected call of InsertUser

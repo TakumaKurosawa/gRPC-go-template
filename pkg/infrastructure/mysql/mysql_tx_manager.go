@@ -3,11 +3,11 @@ package mysql
 import (
 	"context"
 	"database/sql"
-	"net/http"
 	"dataflow/pkg/domain/repository"
 	"dataflow/pkg/terrors"
 
 	"github.com/volatiletech/sqlboiler/boil"
+	"google.golang.org/grpc/codes"
 )
 
 type dbMasterTxManager struct {
@@ -28,7 +28,7 @@ func (m *dbMasterTxManager) Transaction(ctx context.Context, f func(ctx context.
 		if p := recover(); p != nil {
 			e := tx.Rollback()
 			if e != nil {
-				err = terrors.Wrapf(e, http.StatusInternalServerError, "Mysqlのトランザクションロールバックに失敗しました。", "failed to MySQL Rollback")
+				err = terrors.Wrapf(e, codes.Internal, "Mysqlのトランザクションロールバックに失敗しました。", "failed to MySQL Rollback")
 			}
 			panic(p) // re-throw panic after Rollback
 		}
@@ -36,13 +36,13 @@ func (m *dbMasterTxManager) Transaction(ctx context.Context, f func(ctx context.
 		if err != nil {
 			e := tx.Rollback()
 			if e != nil {
-				err = terrors.Wrapf(e, http.StatusInternalServerError, "Mysqlのトランザクションロールバックに失敗しました。", "failed to MySQL Rollback")
+				err = terrors.Wrapf(e, codes.Internal, "Mysqlのトランザクションロールバックに失敗しました。", "failed to MySQL Rollback")
 			}
 		}
 		// 正常
 		e := tx.Commit()
 		if e != nil {
-			err = terrors.Wrapf(e, http.StatusInternalServerError, "Mysqlのトランザクションコミットに失敗しました。", "failed to MySQL Commit")
+			err = terrors.Wrapf(e, codes.Internal, "Mysqlのトランザクションコミットに失敗しました。", "failed to MySQL Commit")
 		}
 	}()
 	err = f(ctx, &dbMasterTx{tx})
@@ -72,7 +72,7 @@ func ExtractTx(masterTx repository.MasterTx) (*sql.Tx, error) {
 	// キャストする
 	tx, ok := masterTx.(*dbMasterTx)
 	if !ok {
-		return nil, terrors.Newf(http.StatusInternalServerError, "masterTxからdbMasterTxへのキャストに失敗しました。", "masterTx cannot cast to dbMasterTx")
+		return nil, terrors.Newf(codes.Internal, "masterTxからdbMasterTxへのキャストに失敗しました。", "masterTx cannot cast to dbMasterTx")
 	}
 	return tx.tx, nil
 }

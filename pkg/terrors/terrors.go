@@ -2,15 +2,15 @@ package terrors
 
 import (
 	"fmt"
-	"net/http"
 
 	"golang.org/x/xerrors"
+	"google.golang.org/grpc/codes"
 )
 
 // DataflowError サーバ-クライアント間エラーハンドリング用エラー
 type DataflowError struct {
 	// エラーコード
-	ErrorCode int
+	ErrorCode codes.Code
 	// システムエラーメッセージ(日本語)
 	ErrorMessageJP string
 	// システムエラーメッセージ(英語)
@@ -22,26 +22,26 @@ type DataflowError struct {
 }
 
 // New DataflowErrorを生成する
-func New(errorCode int) error {
+func New(errorCode codes.Code) error {
 	return newError(nil, errorCode, "", "")
 }
 
 // Newf DataflowErrorをエラーメッセージ付きで生成する
-func Newf(errorCode int, messageJP string, messageEN string) error {
+func Newf(errorCode codes.Code, messageJP string, messageEN string) error {
 	return newError(nil, errorCode, messageJP, messageEN)
 }
 
 // Wrap エラーをDataflowエラーでラップする
-func Wrap(cause error, errorCode int) error {
+func Wrap(cause error, errorCode codes.Code) error {
 	return newError(cause, errorCode, "", "")
 }
 
 // Wrapf エラーをDataflowエラーで、エラーメッセージ付きでラップする
-func Wrapf(cause error, errorCode int, messageJP, messageEN string) error {
+func Wrapf(cause error, errorCode codes.Code, messageJP, messageEN string) error {
 	return newError(cause, errorCode, messageJP, messageEN)
 }
 
-func newError(cause error, errorCode int, errorMessageJP, errorMessageEN string) error {
+func newError(cause error, errorCode codes.Code, errorMessageJP, errorMessageEN string) error {
 	return &DataflowError{
 		ErrorCode:      errorCode,
 		ErrorMessageJP: errorMessageJP,
@@ -54,7 +54,7 @@ func newError(cause error, errorCode int, errorMessageJP, errorMessageEN string)
 // Stack エラーをStackする
 // スタックフレームを明示的に積んでいく必要があるためエラー出力に記録したいエラーハンドリング箇所ではStackを行う
 func Stack(err error) error {
-	var errorCode int
+	var errorCode codes.Code
 	var errorMessageJP, errorMessageEN string
 	var dataflowError *DataflowError
 	if ok := xerrors.As(err, &dataflowError); ok {
@@ -63,7 +63,7 @@ func Stack(err error) error {
 		errorMessageEN = dataflowError.ErrorMessageEN
 	} else {
 		return &DataflowError{
-			ErrorCode:      http.StatusInternalServerError,
+			ErrorCode:      codes.Internal,
 			ErrorMessageJP: "エラーのコンバート時にエラーが発生しました",
 			ErrorMessageEN: "Error occured at covert to original error",
 			err:            err,

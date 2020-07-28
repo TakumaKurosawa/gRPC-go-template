@@ -10,7 +10,7 @@ const AppLoggerKey = "AppLogger"
 func init() {
 	config := zap.NewProductionConfig()
 	config.Level = zap.NewAtomicLevelAt(zap.ErrorLevel)
-	config.DisableStacktrace = true // スタックトレースONにしたい場合はfalseにする
+	config.DisableStacktrace = false // スタックトレースONにしたい場合はfalseにする
 	logger, _ := config.Build()
 	appLogger = logger.Named(AppLoggerKey)
 }

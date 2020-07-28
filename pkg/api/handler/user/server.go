@@ -6,7 +6,8 @@ import (
 	userinteractor "dataflow/pkg/api/usecase/user"
 	"dataflow/pkg/pb"
 	"dataflow/pkg/terrors"
-	"net/http"
+
+	"google.golang.org/grpc/codes"
 )
 
 type Server struct {
@@ -22,12 +23,12 @@ func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb
 	if !ok {
 		errMessageJP := "不正なユーザからのアクセスをブロックしました。"
 		errMessageEN := "The content blocked because user is not certified."
-		return nil, terrors.Newf(http.StatusUnauthorized, errMessageJP, errMessageEN)
+		return nil, terrors.Newf(codes.Unauthenticated, errMessageJP, errMessageEN)
 	}
 
 	insertedUser, err := s.userInteractor.CreateNewUser(ctx, uid, req.Name, req.Thumbnail)
 	if err != nil {
-		return nil, err
+		return nil, terrors.Stack(err)
 	}
 
 	return &pb.UserInfo{
@@ -41,7 +42,7 @@ func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb
 //	if !ok {
 //		errMessageJP := "不正なユーザからのアクセスをブロックしました。"
 //		errMessageEN := "The content blocked because user is not certified."
-//		return nil, terrors.Newf(http.StatusUnauthorized, errMessageJP, errMessageEN)
+//		return nil, terrors.Newf(codes.Unauthenticated, errMessageJP, errMessageEN)
 //	}
 //
 //	userData, err := s.userInteractor.GetUserProfile(ctx, uid)

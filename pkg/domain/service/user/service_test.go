@@ -1,12 +1,12 @@
 package user
 
 import (
-	"testing"
+	"context"
 	"dataflow/pkg/domain/entity"
 	"dataflow/pkg/domain/repository"
 	"dataflow/pkg/domain/repository/user/mock_user"
+	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,23 +19,28 @@ const (
 )
 
 func TestService_CreateNewUser(t *testing.T) {
-	ctx := &gin.Context{}
+	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	masterTx := repository.NewMockMasterTx()
 
 	userRepository := mock_user.NewMockRepository(ctrl)
-	userRepository.EXPECT().InsertUser(ctx, masterTx, uid, name, thumbnail).Return(nil).Times(1)
+	userRepository.EXPECT().InsertUser(ctx, masterTx, uid, name, thumbnail).Return(&entity.User{
+		ID:        userID,
+		Name:      name,
+		Thumbnail: thumbnail,
+	}, nil).Times(1)
 
 	service := New(userRepository)
-	err := service.CreateNewUser(ctx, masterTx, uid, name, thumbnail)
+	insertedUser, err := service.CreateNewUser(ctx, masterTx, uid, name, thumbnail)
 
 	assert.NoError(t, err)
+	assert.NotNil(t, insertedUser)
 }
 
 func TestService_GetByPK(t *testing.T) {
-	ctx := &gin.Context{}
+	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -58,7 +63,7 @@ func TestService_GetByPK(t *testing.T) {
 }
 
 func TestService_SelectAll(t *testing.T) {
-	ctx := &gin.Context{}
+	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 

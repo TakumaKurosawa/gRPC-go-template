@@ -727,6 +727,7 @@ func (o UserSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 
 var mySQLUserUniqueColumns = []string{
 	"id",
+	"uid",
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.

@@ -7,7 +7,9 @@ import (
 	"fmt"
 
 	"golang.org/x/xerrors"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
 func UnaryErrorHandling() grpc.UnaryServerInterceptor {
@@ -21,21 +23,30 @@ func UnaryErrorHandling() grpc.UnaryServerInterceptor {
 
 		if err != nil {
 			// エラーログ出力
-			uid := ctx.Value(string(AuthedUserKey))
-			if uid == "" {
+			uid, ok := ctx.Value(AuthedUserKey).(string)
+			if !ok {
 				tlog.GetAppLogger().Error(fmt.Sprintf("<[Unknown]:%v>", err))
 			} else {
-				tlog.GetAppLogger().Error(fmt.Sprintf("<[%s]:%v>", uid, err))
+				tlog.GetAppLogger().Error(fmt.Sprintf("<[%v]:%v>", uid, err))
 			}
 
 			// エラーレスポンスの送信
-			if err != nil {
-				var dataflowError *terrors.DataflowError
-				if ok := xerrors.As(err, &dataflowError); ok {
-					return nil, dataflowError
+			var dataflowError *terrors.DataflowError
+			if ok := xerrors.As(err, &dataflowError); ok {
+				st := status.New(dataflowError.ErrorCode, "some error occurred")
+				errResJP := &errdetails.LocalizedMessage{
+					Locale:  "ja-JP",
+					Message: dataflowError.ErrorMessageJP,
 				}
-				return nil, err
+				errResEN := &errdetails.LocalizedMessage{
+					Locale:  "en-US",
+					Message: dataflowError.ErrorMessageEN,
+				}
+				detailsErr, _ := st.WithDetails(errResJP, errResEN)
+				return nil, detailsErr.Err()
 			}
+			return nil, err
+
 		}
 
 		return resp, nil
@@ -49,17 +60,27 @@ func StreamErrorHandling() grpc.StreamServerInterceptor {
 
 		if err != nil {
 			// エラーログ出力
-			uid := ctx.Value(string(AuthedUserKey))
-			if uid == "" {
+			uid, ok := ctx.Value(AuthedUserKey).(string)
+			if !ok {
 				tlog.GetAppLogger().Error(fmt.Sprintf("<[Unknown]:%v>", err))
 			} else {
-				tlog.GetAppLogger().Error(fmt.Sprintf("<[%s]:%v>", uid, err))
+				tlog.GetAppLogger().Error(fmt.Sprintf("<[%v]:%v>", uid, err))
 			}
 
 			// エラーレスポンスの送信
 			var dataflowError *terrors.DataflowError
 			if ok := xerrors.As(err, &dataflowError); ok {
-				return dataflowError
+				st := status.New(dataflowError.ErrorCode, "some error occurred")
+				errResJP := &errdetails.LocalizedMessage{
+					Locale:  "ja-JP",
+					Message: dataflowError.ErrorMessageJP,
+				}
+				errResEN := &errdetails.LocalizedMessage{
+					Locale:  "en-US",
+					Message: dataflowError.ErrorMessageEN,
+				}
+				detailsErr, _ := st.WithDetails(errResJP, errResEN)
+				return detailsErr.Err()
 			}
 			return err
 		}
