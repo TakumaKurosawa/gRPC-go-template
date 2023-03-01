@@ -1,4 +1,5 @@
-//+build wireinject
+//go:build wireinject
+// +build wireinject
 
 package main
 
@@ -7,7 +8,7 @@ import (
 	userInteractor "dataflow/pkg/api/usecase/user"
 	"dataflow/pkg/domain/repository"
 	userSvc "dataflow/pkg/domain/service/user"
-	userRepo "dataflow/pkg/infrastructure/mysql/user"
+	userRepo "dataflow/pkg/infrastructure/dynamo/user"
 
 	"github.com/google/wire"
 )
