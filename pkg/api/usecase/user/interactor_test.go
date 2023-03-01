@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	"dataflow/pkg/domain/entity"
+	"dataflow/pkg/domain/entity/user"
 	"dataflow/pkg/domain/repository"
 	"dataflow/pkg/domain/service/user/mock_user"
 	"testing"
@@ -27,7 +27,7 @@ func TestIntereractor_CreateNewUser(t *testing.T) {
 	masterTxManager := repository.NewMockMasterTxManager(masterTx)
 
 	userService := mock_user.NewMockService(ctrl)
-	userService.EXPECT().CreateNewUser(ctx, masterTx, uid, name, thumbnail).Return(&entity.User{
+	userService.EXPECT().CreateNewUser(ctx, masterTx, uid, name, thumbnail).Return(&user.User{
 		ID:        userID,
 		Name:      name,
 		Thumbnail: thumbnail,
@@ -45,7 +45,7 @@ func TestIntereractor_GetUserProfile(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	existedUser := &entity.User{
+	existedUser := &user.User{
 		ID:        userID,
 		Name:      name,
 		Thumbnail: thumbnail,
@@ -69,7 +69,7 @@ func TestIntereractor_GetAll(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	existedUsers := entity.UserSlice{
+	existedUsers := user.UserSlice{
 		{
 			ID:        userID,
 			Name:      name,

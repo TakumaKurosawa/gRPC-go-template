@@ -1,8 +1,8 @@
-package user
+package userservice
 
 import (
 	"context"
-	"dataflow/pkg/domain/entity"
+	"dataflow/pkg/domain/entity/user"
 	"dataflow/pkg/domain/repository"
 	"dataflow/pkg/domain/repository/user/mock_user"
 	"testing"
@@ -26,7 +26,7 @@ func TestService_CreateNewUser(t *testing.T) {
 	masterTx := repository.NewMockMasterTx()
 
 	userRepository := mock_user.NewMockRepository(ctrl)
-	userRepository.EXPECT().InsertUser(ctx, masterTx, uid, name, thumbnail).Return(&entity.User{
+	userRepository.EXPECT().InsertUser(ctx, masterTx, uid, name, thumbnail).Return(&user.User{
 		ID:        userID,
 		Name:      name,
 		Thumbnail: thumbnail,
@@ -46,7 +46,7 @@ func TestService_GetByPK(t *testing.T) {
 
 	masterTx := repository.NewMockMasterTx()
 
-	existedUser := &entity.User{
+	existedUser := &user.User{
 		ID:        userID,
 		Name:      name,
 		Thumbnail: thumbnail,
@@ -69,7 +69,7 @@ func TestService_SelectAll(t *testing.T) {
 
 	masterTx := repository.NewMockMasterTx()
 
-	existedUsers := entity.UserSlice{
+	existedUsers := user.UserSlice{
 		{
 			ID:        userID,
 			Name:      name,

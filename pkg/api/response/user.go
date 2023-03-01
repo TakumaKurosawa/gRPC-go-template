@@ -1,7 +1,7 @@
 package response
 
 import (
-	"dataflow/pkg/domain/entity"
+	"dataflow/pkg/domain/entity/user"
 )
 
 type UserResponse struct {
@@ -12,7 +12,7 @@ type UserResponse struct {
 
 type UsersResponse []*UserResponse
 
-func ConvertToUsersResponse(userSlice entity.UserSlice) UsersResponse {
+func ConvertToUsersResponse(userSlice user.UserSlice) UsersResponse {
 	res := make(UsersResponse, 0, len(userSlice))
 	for _, userData := range userSlice {
 		res = append(res, ConvertToUserResponse(userData))
@@ -20,7 +20,7 @@ func ConvertToUsersResponse(userSlice entity.UserSlice) UsersResponse {
 	return res
 }
 
-func ConvertToUserResponse(userData *entity.User) *UserResponse {
+func ConvertToUserResponse(userData *user.User) *UserResponse {
 	// nilチェック
 	if userData == nil {
 		return nil

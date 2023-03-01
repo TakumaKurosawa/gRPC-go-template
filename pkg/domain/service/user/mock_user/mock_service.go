@@ -6,7 +6,7 @@ package mock_user
 
 import (
 	context "context"
-	entity "dataflow/pkg/domain/entity"
+	entity "dataflow/pkg/domain/entity/user"
 	repository "dataflow/pkg/domain/repository"
 	reflect "reflect"
 

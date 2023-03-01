@@ -6,7 +6,7 @@ package mock_user
 
 import (
 	context "context"
-	entity "dataflow/pkg/domain/entity"
+	entity "dataflow/pkg/domain/entity/user"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
